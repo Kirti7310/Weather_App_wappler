@@ -1,0 +1,14 @@
+{
+  "indexnew.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "getweather.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  },
+  "weatherpage.ejs": {
+    "layoutPage": "main",
+    "description": ""
+  }
+}

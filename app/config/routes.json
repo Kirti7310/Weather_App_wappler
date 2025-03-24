@@ -1,0 +1,19 @@
+{
+  "routes": [
+    {
+      "path": "/indexnew",
+      "page": "indexnew",
+      "layout": "main"
+    },
+    {
+      "path": "/getweather",
+      "page": "getweather",
+      "layout": "main"
+    },
+    {
+      "path": "/weatherpage",
+      "page": "weatherpage",
+      "layout": "main"
+    }
+  ]
+}

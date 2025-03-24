@@ -1,0 +1,169 @@
+{
+  "meta": {
+    "$_GET": [
+      {
+        "type": "text",
+        "fieldName": "city",
+        "name": "city"
+      },
+      {
+        "type": "text",
+        "name": "sort"
+      },
+      {
+        "type": "text",
+        "name": "dir"
+      }
+    ]
+  },
+  "exec": {
+    "steps": [
+      {
+        "name": "get_weather_query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "weather_db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "weather",
+                "column": "city",
+                "recid": 1
+              },
+              {
+                "table": "weather",
+                "column": "temp",
+                "recid": 2
+              },
+              {
+                "table": "weather",
+                "column": "description",
+                "recid": 3
+              },
+              {
+                "table": "weather",
+                "column": "id",
+                "recid": 4
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.city}}",
+                "test": "London"
+              }
+            ],
+            "table": {
+              "name": "weather"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "weather.city",
+                  "field": "weather.city",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.city}}",
+                  "data": {
+                    "table": "weather",
+                    "column": "city",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "primary": false,
+                      "nullable": false,
+                      "name": "city"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "weather"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `city`, `temp`, `description`, `id` from `weather` where `weather`.`city` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "city"
+          },
+          {
+            "type": "number",
+            "name": "temp"
+          },
+          {
+            "type": "text",
+            "name": "description"
+          },
+          {
+            "type": "number",
+            "name": "id"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{get_weather_query+'.COUNT() == 0'}}",
+          "then": {
+            "steps": {
+              "name": "api",
+              "module": "api",
+              "action": "send",
+              "options": {
+                "url": "/api/weather_api",
+                "params": {
+                  "city": "{{$_GET.city}}"
+                }
+              },
+              "output": true
+            }
+          }
+        },
+        "outputType": "boolean"
+      },
+      {
+        "name": "weather_city",
+        "module": "core",
+        "action": "setvalue",
+        "options": {
+          "value": "{{get_weather_query}}"
+        },
+        "meta": [
+          {
+            "name": "city",
+            "type": "text"
+          },
+          {
+            "name": "temp",
+            "type": "number"
+          },
+          {
+            "name": "description",
+            "type": "text"
+          },
+          {
+            "name": "id",
+            "type": "number"
+          }
+        ],
+        "outputType": "array"
+      }
+    ]
+  }
+}

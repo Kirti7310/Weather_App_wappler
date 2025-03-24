@@ -1,0 +1,16 @@
+{
+  "name": "weather_db",
+  "module": "dbconnector",
+  "action": "connect",
+  "options": {
+    "client": "mysql2",
+    "connection": {
+      "host": "localhost",
+      "user": "root",
+      "password": "root",
+      "database": "project_weather"
+    },
+    "tz": "utc"
+  },
+  "fileName": "weather_db.json"
+}

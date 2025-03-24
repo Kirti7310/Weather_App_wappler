@@ -1,0 +1,32 @@
+{
+  "hostingType": "wappler",
+  "projectServerModel": "node",
+  "runtime": "capacitor",
+  "projectName": "Weather_project",
+  "webRootFolder": "/public",
+  "useRouting": true,
+  "addBase": true,
+  "routingHandler": "node",
+  "projectLinksType": "site",
+  "targets": [
+    {
+      "name": "Development",
+      "remoteURL": "http://localhost:3000",
+      "access": "local",
+      "targetType": "wappler"
+    }
+  ],
+  "activeTarget": "Development",
+  "projectType": "web",
+  "frameworks": [
+    {
+      "name": "appConnect",
+      "type": "local"
+    },
+    {
+      "name": "bootstrap5",
+      "type": "cdn"
+    }
+  ],
+  "extensions": []
+}

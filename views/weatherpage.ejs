@@ -1,0 +1,37 @@
+<!-- Wappler include head-page="layouts/main" is="dmx-app" id="weatherpage" appConnect="local" bootstrap5="cdn" -->
+<dmx-serverconnect id="serverconnect1" url="/api/weather_api" dmx-param:city="register1.city.value"></dmx-serverconnect>
+
+
+
+<div class="container">
+
+    <form id="register1">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-7 col-md-5 text-center">
+
+                <div class="fdb-box fdb-touch">
+                    <div class="row">
+                        <div class="col">
+                            <h1>WEATHER APP</h1>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col mt-4">
+                            <input type="text" id="city" name="city" dmx-bind:value="register1.city.value" class="form-control" placeholder="Enter the city">
+                        </div>
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col">
+                            <button id="register1_submit" class="btn" type="button" dmx-on:click="serverconnect1.load({city: register1.city.value})">Get Weather</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <h1 dmx-text="serverconnect1.data.weather_query[0].city"></h1>
+    <h1 dmx-text="city.value"></h1>
+    <p dmx-text="serverconnect1.data.weather_query[0].temp"></p>
+
+</div>
+<meta name="ac:route" content="/weatherpage">
