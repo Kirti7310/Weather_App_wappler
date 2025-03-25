@@ -38,6 +38,241 @@
             "columns": [
               {
                 "table": "weather",
+                "column": "city",
+                "recid": 1
+              },
+              {
+                "table": "weather",
+                "column": "id",
+                "recid": 2
+              },
+              {
+                "table": "weather",
+                "column": "temp",
+                "recid": 3
+              }
+            ],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.city}}",
+                "test": ""
+              }
+            ],
+            "table": {
+              "name": "weather"
+            },
+            "primary": "id",
+            "joins": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "weather.city",
+                  "field": "weather.city",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.city}}",
+                  "data": {
+                    "table": "weather",
+                    "column": "city",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "primary": false,
+                      "nullable": false,
+                      "name": "city"
+                    }
+                  },
+                  "operation": "=",
+                  "table": "weather"
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select `city`, `id`, `temp` from `weather` where `weather`.`city` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "city"
+          },
+          {
+            "type": "number",
+            "name": "id"
+          },
+          {
+            "type": "number",
+            "name": "temp"
+          }
+        ],
+        "outputType": "array"
+      },
+      {
+        "name": "query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "weather_db",
+          "sql": {
+            "type": "select",
+            "distinct": false,
+            "columns": [
+              {
+                "table": "weather",
+                "column": "city",
+                "aggregate": "COUNT",
+                "alias": "count"
+              }
+            ],
+            "table": {
+              "name": "weather"
+            },
+            "joins": [],
+            "orders": [],
+            "params": [
+              {
+                "operator": "equal",
+                "type": "expression",
+                "name": ":P1",
+                "value": "{{$_GET.city}}",
+                "test": ""
+              }
+            ],
+            "primary": "id",
+            "groupBy": [],
+            "wheres": {
+              "condition": "AND",
+              "rules": [
+                {
+                  "id": "weather.city",
+                  "field": "weather.city",
+                  "type": "string",
+                  "operator": "equal",
+                  "value": "{{$_GET.city}}",
+                  "data": {
+                    "table": "weather",
+                    "column": "city",
+                    "type": "text",
+                    "columnObj": {
+                      "type": "string",
+                      "maxLength": 20,
+                      "primary": false,
+                      "nullable": false,
+                      "name": "city"
+                    }
+                  },
+                  "operation": "="
+                }
+              ],
+              "conditional": null,
+              "valid": true
+            },
+            "query": "select count(`city`) as `count` from `weather` where `weather`.`city` = ?"
+          }
+        },
+        "output": true,
+        "meta": [
+          {
+            "type": "text",
+            "name": "count"
+          }
+        ],
+        "outputType": "array",
+        "type": "dbconnector_select"
+      },
+      {
+        "name": "",
+        "module": "core",
+        "action": "condition",
+        "options": {
+          "if": "{{query[0].count==0}}",
+          "then": {
+            "steps": {
+              "name": "insert_weather",
+              "module": "dbupdater",
+              "action": "insert",
+              "options": {
+                "connection": "weather_db",
+                "sql": {
+                  "type": "insert",
+                  "values": [
+                    {
+                      "table": "weather",
+                      "column": "city",
+                      "type": "text",
+                      "value": "{{$_GET.city}}"
+                    },
+                    {
+                      "table": "weather",
+                      "column": "temp",
+                      "type": "number",
+                      "value": "{{api.data.main.temp}}"
+                    },
+                    {
+                      "table": "weather",
+                      "column": "description",
+                      "type": "text",
+                      "value": "{{api.data.weather[0].description}}"
+                    }
+                  ],
+                  "table": "weather",
+                  "returning": "id",
+                  "query": "insert into `weather` (`city`, `description`, `temp`) values (?, ?, ?)",
+                  "params": [
+                    {
+                      "name": ":P1",
+                      "type": "expression",
+                      "value": "{{$_GET.city}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P2",
+                      "type": "expression",
+                      "value": "{{api.data.main.temp}}",
+                      "test": ""
+                    },
+                    {
+                      "name": ":P3",
+                      "type": "expression",
+                      "value": "{{api.data.weather[0].description}}",
+                      "test": ""
+                    }
+                  ]
+                }
+              },
+              "meta": [
+                {
+                  "name": "identity",
+                  "type": "text"
+                },
+                {
+                  "name": "affected",
+                  "type": "number"
+                }
+              ]
+            }
+          }
+        },
+        "outputType": "boolean"
+      },
+      {
+        "name": "weather_query",
+        "module": "dbconnector",
+        "action": "select",
+        "options": {
+          "connection": "weather_db",
+          "sql": {
+            "type": "select",
+            "columns": [
+              {
+                "table": "weather",
                 "column": "city"
               },
               {
@@ -112,85 +347,6 @@
         "outputType": "array"
       },
       {
-        "name": "",
-        "module": "core",
-        "action": "condition",
-        "options": {
-          "if": "{{weather_query.COUNT()==0}}",
-          "then": {
-            "steps": {
-              "name": "insert_weather",
-              "module": "dbupdater",
-              "action": "insert",
-              "options": {
-                "connection": "weather_db",
-                "sql": {
-                  "type": "insert",
-                  "values": [
-                    {
-                      "table": "weather",
-                      "column": "city",
-                      "type": "text",
-                      "value": "{{$_GET.city}}",
-                      "recid": 1
-                    },
-                    {
-                      "table": "weather",
-                      "column": "temp",
-                      "type": "number",
-                      "value": "{{api.data.main.temp}}",
-                      "recid": 2
-                    },
-                    {
-                      "table": "weather",
-                      "column": "description",
-                      "type": "text",
-                      "value": "{{api.data.weather[0].description}}",
-                      "recid": 3
-                    }
-                  ],
-                  "table": "weather",
-                  "returning": "id",
-                  "query": "insert into `weather` (`city`, `description`, `temp`) values (?, ?, ?)",
-                  "params": [
-                    {
-                      "name": ":P1",
-                      "type": "expression",
-                      "value": "{{$_GET.city}}",
-                      "test": ""
-                    },
-                    {
-                      "name": ":P2",
-                      "type": "expression",
-                      "value": "{{api.data.main.temp}}",
-                      "test": ""
-                    },
-                    {
-                      "name": ":P3",
-                      "type": "expression",
-                      "value": "{{api.data.weather[0].description}}",
-                      "test": ""
-                    }
-                  ]
-                }
-              },
-              "meta": [
-                {
-                  "name": "identity",
-                  "type": "text"
-                },
-                {
-                  "name": "affected",
-                  "type": "number"
-                }
-              ]
-            }
-          }
-        },
-        "outputType": "boolean",
-        "disabled": true
-      },
-      {
         "name": "RESPONSE",
         "module": "core",
         "action": "setvalue",
@@ -219,8 +375,9 @@
         "action": "response",
         "options": {
           "status": 200,
-          "data": "{{RESPONSE}}"
-        }
+          "data": "{{weather_query}}"
+        },
+        "disabled": true
       }
     ]
   }
